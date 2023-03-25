@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './Input.scss';
 
 type InputProps = {
   label: string,
@@ -7,7 +8,7 @@ type InputProps = {
   name?: string;
   value: string,
   required?: boolean,
-  placeholder: string,
+  placeholder?: string,
   handler: (e: any) => void
 }
 
@@ -21,22 +22,11 @@ const Input: React.FC<InputProps> = ({
   placeholder,
   handler
 }) => {
-  // const [inputValue, setInputValue] = React.useState({
-  //   firstName: '',
-  //   lastName: '',
-  //   tel: '',
-  //   email: '',
-  // });
-  // console.log(inputValue);
-  
-  // const handleChange = (e: any) => {
-  //   const value = e.currentTarget.value;
-  //   setInputValue( {...inputValue, [e.target.name]: value});
-  // }
   return (
     <div className="field-wrapper">
-    <label htmlFor={id}>{label}</label>
+    <label className='form-label' htmlFor={id}>{label}</label>
     <input
+      className="form-input"
       type={type}
       id={id}
       name={name}

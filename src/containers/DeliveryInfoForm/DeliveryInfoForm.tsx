@@ -1,8 +1,9 @@
 import * as React from "react";
+import "./DeliveryInfoForm.scss"
 import Input from "../../components/Input/Input";
 import RadioButton from "../../components/RadioButton/RadioButton";
 import Select from "../../components/Select/Select";
-import type { DeliveryFormState } from "../../features/form/deliveryFormSlice"
+import TextInput from "../../components/TextInput/TextInput"
 
 type DeliveryInfoFormProps = {
   handler: (e: any) => void,
@@ -11,13 +12,23 @@ type DeliveryInfoFormProps = {
 const DeliveryInfoForm: React.FC<DeliveryInfoFormProps>  = ({
   handler
 }) => {
-  const deliveryData: DeliveryFormState = {
+  const [inputValue, setInputValue] = React.useState({
     country: "",
     city: "",
     zipcode: "",
     comment: "",
-  }
-  const [inputValue, setInputValue] = React.useState(deliveryData);
+    date: "",
+  });
+
+  const [country, setCountry] = React.useState("");
+  console.log(country);
+
+  const handleCountryChange = (e: any): void => {
+    const value = e.currentTarget.value;
+    setCountry(value);
+    console.log("targetName", e.target.name);
+  };
+
 
   const [checkedValue, setChekedValue] = React.useState("delivery");
   const radioChangeHandler = (e: any) => {
@@ -31,11 +42,14 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps>  = ({
   };
 
   return (
-    <form action="" onSubmit={(e)=>handler(e)}>
+    <form className="form" action="" onSubmit={(e)=>handler(e)}>
+      <h2 className="title">Адрес доставки:</h2>
+      <div className="form__wrapper-radio">
       <RadioButton
         label="Доставка"
         type="radio"
         id="delivery"
+        name="delivery"
         value="delivery"
         isSelected={checkedValue === "delivery"}
         changed={radioChangeHandler}
@@ -44,18 +58,21 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps>  = ({
         label="Самовывоз"
         type="radio"
         id="pickup"
+        name="pickup"
         value="pickup"
         isSelected={checkedValue === "pickup"}
         changed={radioChangeHandler}
       />
+      </div>
       {checkedValue === "delivery" ? (
-        <div>
+        <>
           <Select
-            label="Выберите страну"
+            label="Выберите страну:"
             name="country"
             id="country"
-            value="country"
+            value={country}
             required
+            handler={handleCountryChange}
           />
           <Input
             label="Город:"
@@ -75,18 +92,14 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps>  = ({
             placeholder="Введите Индекс"
             handler={handleChange}
           />
-          <input type="date" />
-          <div>
-            <textarea name="comment" id="comment"></textarea>
-          </div>
-        </div>
+          <Input label="Выберите дату:" type="date" id="date" name="date" value={inputValue.date} handler={handleChange} />
+          <TextInput label="Введите ваш комментарий" id="comment" name="comment" value={inputValue.comment} placeholder="Введите ваш комментарий" handler={handleChange} />
+        </>
       ) : (
-        <div>
-          <textarea name="comment" id="comment"></textarea>
-        </div>
+          <TextInput label="Введите ваш комментарий" id="comment" name="comment" value={inputValue.comment} placeholder="Введите ваш комментарий" handler={handleChange} />
       )}
 
-      <button type="submit">Оформить заказ</button>
+      <button className="button" type="submit">Оформить заказ</button>
     </form>
   );
 };

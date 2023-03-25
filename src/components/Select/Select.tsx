@@ -10,11 +10,13 @@ export const countries: string[] = [
 ];
 
 type SelectProps = {
-  label: string;
-  id: string;
-  name?: string;
-  value: string;
-  required?: boolean;
+  label: string,
+  id: string,
+  name?: string,
+  value: string,
+  required?: boolean,
+  handler: (e: any) => void,
+
 };
 
 const Select: React.FC<SelectProps> = ({
@@ -23,21 +25,21 @@ const Select: React.FC<SelectProps> = ({
   name,
   value,
   required,
+  handler,
 }) => {
-  const [country, setCountry] = React.useState("");
-  console.log(country);
   const options = countries.map((text, index) => {
     return <option key={index}>{text}</option>;
   });
   return (
     <div className="field-wrapper">
-      <label htmlFor={id}>{label}</label>
+      <label className="form-label" htmlFor={id}>{label}</label>
       <select
+        className="form-input"
         name={name}
         id={id}
-        value={country}
+        value={value}
         required={required}
-        onChange={(e) => setCountry(e.target.value)}
+        onChange={(e)=>handler(e)}
       >
         {options}
       </select>
