@@ -1,5 +1,4 @@
 import * as React from "react";
-// import countries from "./utils/countries"
 
 export const countries: string[] = [
   "Россия",
@@ -11,13 +10,12 @@ export const countries: string[] = [
 ];
 
 type SelectProps = {
-  label: string,
-  id: string,
-  name?: string,
-  value: string,
-  required?: boolean,
-  handler: (e: any) => void,
-
+  label: string;
+  id: string;
+  name: string;
+  value: string;
+  required?: boolean;
+  handler: (e: any) => void;
 };
 
 const Select: React.FC<SelectProps> = ({
@@ -33,14 +31,17 @@ const Select: React.FC<SelectProps> = ({
   });
   return (
     <div className="field-wrapper">
-      <label className="form-label" htmlFor={id}>{label}</label>
+      <label className="form-label" htmlFor={id}>
+        {label}
+        <span>*</span>
+      </label>
       <select
         className="form-input"
         name={name}
         id={id}
         value={value}
         required={required}
-        onChange={(e)=>handler(e)}
+        onChange={(e) => handler(e)}
       >
         {options}
       </select>

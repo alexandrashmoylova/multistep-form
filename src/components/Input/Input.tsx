@@ -5,7 +5,7 @@ type InputProps = {
   label: string,
   type: string,
   id: string,
-  name?: string;
+  name: string;
   value: string,
   required?: boolean,
   placeholder?: string,
@@ -24,7 +24,7 @@ const Input: React.FC<InputProps> = ({
 }) => {
   return (
     <div className="field-wrapper">
-    <label className='form-label' htmlFor={id}>{label}</label>
+    <label className='form-label' htmlFor={id}>{label}<span>*</span></label>
     <input
       className="form-input"
       type={type}

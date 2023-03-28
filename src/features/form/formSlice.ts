@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+const axios = require('axios').default;
 
+const API_URL = "https://jsonplaceholder.typicode.com/posts";
 export interface ContactInfo {
   firstName: string;
   lastName: string;
@@ -13,6 +15,7 @@ export interface DeliveryInfo {
   country: string;
   city: string;
   zipcode: string;
+  address: string;
   comment: string;
   date: string;
 }
@@ -36,6 +39,7 @@ const initialState: FormState = {
     country: "Россия",
     city: "",
     zipcode: "",
+    address: "",
     date: "",
     comment: "",
   },
@@ -62,6 +66,19 @@ export const FormSlice = createSlice({
     },
   }
 });
+
+export const addDataAsync = (data: any) => async (dispatch: any) => {
+  try {
+    // console.log(data);
+    const response = await axios.post(API_URL, data);
+    // console.log(response);
+    dispatch(formInfo(response.data));
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const showData = (state: any) => state.form.initialState;
 
 export const { formStage, formInfo, formDelivery } = FormSlice.actions;
 export const reducer = FormSlice.reducer;

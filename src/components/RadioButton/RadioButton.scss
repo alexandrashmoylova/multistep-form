@@ -1,5 +1,11 @@
+.form-radio-label {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 15px;
+}
+
 .form-radio-checkmark {
-  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
