@@ -2,6 +2,7 @@ import * as React from "react";
 // import countries from "./utils/countries"
 
 export const countries: string[] = [
+  "Россия",
   "Казахстан",
   "Турция",
   "Армения",
