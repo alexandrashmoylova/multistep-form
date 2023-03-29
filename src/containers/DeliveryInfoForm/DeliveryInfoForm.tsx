@@ -7,7 +7,8 @@ import RadioButton from "../../components/RadioButton/RadioButton";
 import Select from "../../components/Select/Select";
 import TextInput from "../../components/TextInput/TextInput";
 import type { RootState } from "../../store";
-import { formStage, formDelivery } from "../../features/form/formSlice";
+import { formStage, formDelivery, formInfo } from "../../features/form/formSlice";
+import { postData } from "../../api/connection"
 
 type DeliveryInfoFormProps = {
   submitButtonText: string;
@@ -43,6 +44,10 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
     (state: RootState) => state.FormDeliveryInfo.date
   );
 
+    const formInfoState = useSelector(
+      (state: RootState) => state.FormContactInfo
+    )
+
   const [checkedValue, setChekedValue] = useState(formstageDelivery);
 
   const radioChangeHandler = (e: any) => {
@@ -66,40 +71,79 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
   console.log(inputValue);
 
   const handleCountryChange = (e: any): void => {
-    const value = e.currentTarget.value;
+    const value = e.target.value;
     setCountry(value);
     setInputValue({ ...inputValue, country: value });
     // console.log("country", e.target.name);
   };
 
   const handleChange = (e: any): void => {
-    const value = e.currentTarget.value;
-    setInputValue({ ...inputValue, [e.target.name]: value });
-    console.log("targetName", e.target.name);
+    const {name, value} = e.target;
+    setInputValue({ 
+      ...inputValue, 
+      [name]: value,
+    });
   };
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const handleSubmit = (e: any) => {
+  // const [isSubmitted, setIsSubmitted] = useState(false);
+  const handleSubmit = async (e: any) => {
+    // здесь использую await
     e.preventDefault();
-    setIsSubmitted(true);
+    // setIsSubmitted(true);
+    dispatch(
+      formDelivery({
+        delivery: inputValue.delivery,
+        country: inputValue.country,
+        city: inputValue.city,
+        zipcode: inputValue.zipcode,
+        address: inputValue,
+        date: inputValue.date,
+        comment: inputValue.comment,
+      })
+    );
+    const userData = {
+      ...formInfoState,
+      ...inputValue
+    }
+    try {
+      await postData(userData)
+      dispatch(formStage(3)); 
+    } catch (err) {
+      console.log(err);
+      dispatch(formStage(4));
+    }
   };
 
-  useEffect(() => {
-    if (isSubmitted) {
-      dispatch(formStage(3));
-      dispatch(
-        formDelivery({
-          delivery: inputValue.delivery,
-          country: inputValue.country,
-          city: inputValue.city,
-          zipcode: inputValue.zipcode,
-          address: inputValue,
-          date: inputValue.date,
-          comment: inputValue.comment,
-        })
-      );
-    }
-  }, [inputValue, isSubmitted, dispatch]);
+  // useEffect(() => {
+  //   // async 
+  //   if (isSubmitted) {
+  //     dispatch(
+  //       formDelivery({
+  //         delivery: inputValue.delivery,
+  //         country: inputValue.country,
+  //         city: inputValue.city,
+  //         zipcode: inputValue.zipcode,
+  //         address: inputValue,
+  //         date: inputValue.date,
+  //         comment: inputValue.comment,
+  //       })
+  //     );
+  //     const userData = {
+  //       ...formInfoState,
+  //       ...inputValue
+  //     }
+  //     // console.log('userData', userData);
+    
+  //     // завернуть в try catch
+  //     postData(userData)
+  //     .then((data) => {
+  //       dispatch(formStage(3)); 
+  //       //
+  //       console.log('postData', data);
+  //     })
+      
+  //   }
+  // }, [inputValue, isSubmitted, dispatch]);
 
   return (
     <form className="form" action="" onSubmit={(e) => handleSubmit(e)}>
@@ -195,22 +239,18 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
 
       <div className="form__btn-wrapper">
         {prevButton && (
-          <div>
             <input
               className="button button-back"
               type="submit"
               value={`Назад`}
               onClick={() => dispatch(formStage(currentStage - 1))}
             />
-          </div>
         )}
-        <div>
           <input
             className="button"
             type="submit"
             value={submitButtonText}
           />
-        </div>
       </div>
     </form>
   );

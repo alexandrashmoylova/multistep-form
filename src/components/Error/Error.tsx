@@ -5,28 +5,14 @@ type ErrorProps = {
   message: string;
 };
 
-const Error: React.FC<ErrorProps> = ({
-  title,
-  message
-}) => {
+const Error: React.FC<ErrorProps> = ({ title, message }) => {
   return (
     <>
-      <div className="error-modal">
-          
-          <h2>{title}</h2>
-{/* 
-          <img 
-            className="Error-img"
-            src={} 
-            alt={title}
-          /> */}
-
-          <p>
-            {message}
-          </p>
-
+      <div className="error-modal modal">
+        <h2 className="modal-title">{title}</h2>
+        <p className="modal-message">{message}</p>
       </div>
-      </>
+    </>
   );
 };
 export default Error;

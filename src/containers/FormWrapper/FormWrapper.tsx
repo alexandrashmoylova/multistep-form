@@ -12,21 +12,20 @@ const FormWrapper: React.FC = () => {
   // console.log('pagestage', pageStage);
   return (
     <>
-      {pageStage === 1 && (
-        <ContactInfoForm prevButton={false} submitButtonText={"Продолжить"} />
-      )}
-      {pageStage === 2 && (
-        <DeliveryInfoForm prevButton={true} submitButtonText={"Отправить"} />
-      )}
-      {pageStage === 3 && (
-        <div className="wrap">
-           <Success title="Готово!" message="Ваши данные успешно отправлены!"/>
-        </div>)}
-         {/* : (
-        <div className="wrap">
-          <Error title="Упс..." message="Кажется что-то пошло не так:(" />
-        </div>
-      )} */}
+      <div className="form-wrapper">
+        {pageStage === 1 && (
+          <ContactInfoForm prevButton={false} submitButtonText={"Продолжить"} />
+        )}
+        {pageStage === 2 && (
+          <DeliveryInfoForm prevButton={true} submitButtonText={"Отправить"} />
+        )}
+        {pageStage === 3 && (
+          <Success title="Готово!" message="Ваши данные успешно отправлены!" />
+        )}
+        {pageStage === 4 && (
+          <Error title="Упс!" message="Что-то пошло не так:(" />
+        )}
+      </div>
     </>
   );
 };
