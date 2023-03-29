@@ -1,5 +1,5 @@
 export const postData = async (user: any) => {
-  const url = "https://jsonplaceholder.typicode.com/user";
+  const url = "https://jsonplaceholder.typicode.com/users";
   try {
     const res = await fetch(url, {
       method: "POST",

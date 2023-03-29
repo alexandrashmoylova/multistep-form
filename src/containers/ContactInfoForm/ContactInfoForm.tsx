@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./ContactInfoForm.scss";
-import { useEffect, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { formStage, formInfo } from "../../features/form/formSlice";
 import type { ContactInfo } from "../../features/form/formSlice";
@@ -14,13 +14,12 @@ export interface Errors {
   email: string;
 }
 
-const ErrorsValue: Errors = {
-  firstName: "",
-  lastName: "",
-  tel: "",
-  email: ""
-}
-
+// const ErrorsValue: Errors = {
+//   firstName: "",
+//   lastName: "",
+//   tel: "",
+//   email: "",
+// };
 
 type ContactInfoFormProps = {
   submitButtonText: string;
@@ -32,7 +31,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
   submitButtonText,
 }) => {
   const dispatch = useDispatch();
-  
+
   const formstageFirstName = useSelector(
     (state: RootState) => state.FormContactInfo.firstName
   );
@@ -51,164 +50,148 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
     tel: formstageTel,
     email: formstageEmail,
   });
-  console.log('inputValueTel', inputValue.tel);
-
-
-// проверку засунуть сюда
-  const handleChange = (e: any): void => {
-    const {name, value} = e.target;
-    setInputValue({ 
-      ...inputValue, 
-      [name]: value,
-    });
-    // console.log("targetName", e.target.name);
-  };
-
-  // const validatePhone = (value: any) => {
-  //   const regex = /^\+[0-9]{1,3}\.[0-9]{4,14}(?:x.+)?$/;
-  //   if (regex.test(value) == true) {
-  //     // Valid international phone number
-  //     console.log('правильно тел');
-  // } else {
-  //   console.log("неправильно");
-  //     // Invalid international phone number
-  // }
-  // }
-
-// validatePhone(inputValue.tel);
-  // console.log(validtel);
-
-
-  const [errors, setErrors] = useState({
+  // console.log('inputValueTel', inputValue.tel);
+  const initialErrors = {
     firstName: "",
     lastName: "",
     tel: "",
-    email: ""
-  })
-  console.log("errors", errors);
-  
-  const validate = (inputValue: any) => {
+    email: "",
+  };
 
-    const formErrors: Errors = {
+  const [errors, setErrors] = useState(initialErrors);
+
+  // проверку засунуть сюда
+  const handleChange = (e: any): void => {
+    const { name, value } = e.target;
+    // setInputValue(inputValue[name] = value)
+    setInputValue({
+      ...inputValue,
+      [name]: value,
+    });
+    console.log(inputValue);
+    // validate()
+  };
+
+  const validate = (inputValue: any) => {
+    let formErrors = {
       firstName: "",
       lastName: "",
       tel: "",
-      email: ""
-    } // set form errors to none at start
-    console.log('formErrors', formErrors);
+      email: "",
+    };
+    console.log("formErrors", formErrors);
 
-    // name
-    if(!inputValue.name){
+    if (!inputValue.firstName) {
       formErrors.firstName = "Имя обязательно";
     }
-    
-    // email
-    const emailRegex = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
-    if(!inputValue.email || !emailRegex.test(inputValue.email)) {
-      formErrors.email = 'Введите правильный email';
+
+    if (!inputValue.lastName) {
+      formErrors.lastName = "Фамилия обязательно";
     }
 
-    return formErrors
-  }
-  
+    if (!inputValue.tel) {
+      formErrors.tel = "Телефон обязательно";
+    }
 
-  // const validation = () => {
-  //   if(!validtel) {
-  //     console.log('правильно тел');
-  //   } else {
-  //     console.log("неправильно");
-      
-  //   }
-    
-  // }
-  const [isSubmitted, setIsSubmitted] = useState(false) 
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    // setErrors(validate(inputValue));
-    // validatePhone(inputValue.tel);
-    
-    dispatch(formStage(2));
-    dispatch(
-      formInfo({
-        firstName: inputValue.firstName,
-        lastName: inputValue.lastName,
-        tel: inputValue.tel,
-        email: inputValue.email,
-      })
+    const emailRegex = new RegExp(
+      /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
     );
-    setErrors(validate(inputValue))
-    setIsSubmitted(true);
+    if (!inputValue.email || !emailRegex.test(inputValue.email)) {
+      formErrors.email = "Email обязательно";
+    }
+
+    return formErrors;
   };
 
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleSubmit = useCallback(
+    (e: any) => {
+      console.log("errors", errors);
+      // validate()
+      // console.log('Object.values',Object.values(errors))
+      e.preventDefault();
+      setErrors(validate(inputValue));
+      setIsSubmitted(true);
+    },
+    [errors, setErrors, validate]
+  );
+
   useEffect(() => {
-    console.log('errors', errors);
-    if(Object.keys(errors).length === 0 && isSubmitted) {
-      console.log(inputValue);
-      
+    console.log("errors", errors);
+    if (Object.keys(errors).length === 0 && isSubmitted) {
+      console.log("inputValue", inputValue);
+      dispatch(formStage(2));
+      dispatch(
+        formInfo({
+          firstName: inputValue.firstName,
+          lastName: inputValue.lastName,
+          tel: inputValue.tel,
+          email: inputValue.email,
+        })
+      );
     }
-    
-  }, [errors])
+  }, [errors, dispatch, inputValue]);
 
-  // useEffect(() => {
-  //  if (isSubmitted)  {
-  //     dispatch(formStage(2));
-  //     dispatch(
-  //       formInfo({
-  //         firstName: inputValue.firstName,
-  //         lastName: inputValue.lastName,
-  //         tel: inputValue.tel,
-  //         email: inputValue.email,
-  //       })
-  //     );
-  //   }
-  // }, [inputValue, isSubmitted, dispatch]);
-
-  // console.log('inputValue', inputValue, errors);
-  
+  console.log("inputValue", inputValue, errors);
 
   return (
-    <form className="form" onSubmit={(e) => handleSubmit(e)}>
+    <form noValidate={true} className="form" onSubmit={handleSubmit}>
       <h2 className="title">Основные данные:</h2>
-      <Input
-        label="Имя:"
-        type="text"
-        id="firstName"
-        name="firstName"
-        value={inputValue.firstName}
-        placeholder="Введите имя"
-        handler={handleChange}
-      />
-      {errors.firstName && <span className="error-message">{errors.firstName}</span>}
-      <Input
-        label="Фамилия:"
-        type="text"
-        id="lastName"
-        name="lastName"
-        value={inputValue.lastName}
-        placeholder="Введите Фамилию"
-        handler={handleChange}
-      />
-      <Input
-        label="Телефон:"
-        type="tel"
-        id="tel"
-        name="tel"
-        value={inputValue.tel}
-        placeholder="Введите телефон"
-        handler={handleChange}
-      />
-      <Input
-        label="Email:"
-        type="email"
-        id="email"
-        name="email"
-        value={inputValue.email}
-        placeholder="Введите email"
-        handler={handleChange}
-      />
+      <div className="form-wrapper-input">
+        <Input
+          label="Имя:"
+          type="text"
+          id="firstName"
+          name="firstName"
+          value={inputValue.firstName}
+          placeholder="Введите имя"
+          handler={handleChange}
+        />
+        {errors.firstName && (
+          <span className="error-message">{errors.firstName}</span>
+        )}
+      </div>
+      <div className="form-wrapper-input">
+        <Input
+          label="Фамилия:"
+          type="text"
+          id="lastName"
+          name="lastName"
+          value={inputValue.lastName}
+          placeholder="Введите Фамилию"
+          handler={handleChange}
+        />
+        {errors.lastName && (
+          <span className="error-message">{errors.lastName}</span>
+        )}
+      </div>
+      <div className="form-wrapper-input">
+        <Input
+          label="Телефон:"
+          type="tel"
+          id="tel"
+          name="tel"
+          value={inputValue.tel}
+          placeholder="Введите телефон"
+          handler={handleChange}
+        />
+        {errors.tel && <span className="error-message">{errors.tel}</span>}
+      </div>
+      <div className="form-wrapper-input">
+        <Input
+          label="Email:"
+          type="email"
+          id="email"
+          name="email"
+          value={inputValue.email}
+          placeholder="Введите email"
+          handler={handleChange}
+        />
+        {errors.email && <span className="error-message">{errors.email}</span>}
+      </div>
       <div className="form__btn-wrapper">
-          <input className="button" type="submit" value={submitButtonText} />
+        <input className="button" type="submit" value={submitButtonText} />
       </div>
     </form>
   );
