@@ -1,9 +1,8 @@
 import * as React from "react";
 import "./ContactInfoForm.scss";
-import { useCallback, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { formStage, formInfo } from "../../features/form/formSlice";
-import type { ContactInfo } from "../../features/form/formSlice";
 import type { RootState } from "../../store";
 import Input from "../../components/Input/Input";
 
@@ -13,13 +12,6 @@ export interface Errors {
   tel: string;
   email: string;
 }
-
-// const ErrorsValue: Errors = {
-//   firstName: "",
-//   lastName: "",
-//   tel: "",
-//   email: "",
-// };
 
 type ContactInfoFormProps = {
   submitButtonText: string;
@@ -31,6 +23,13 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
   submitButtonText,
 }) => {
   const dispatch = useDispatch();
+
+  const initialErrors = {
+    firstName: "",
+    lastName: "",
+    tel: "",
+    email: "",
+  };
 
   const formstageFirstName = useSelector(
     (state: RootState) => state.FormContactInfo.firstName
@@ -50,26 +49,17 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
     tel: formstageTel,
     email: formstageEmail,
   });
-  // console.log('inputValueTel', inputValue.tel);
-  const initialErrors = {
-    firstName: "",
-    lastName: "",
-    tel: "",
-    email: "",
-  };
 
   const [errors, setErrors] = useState(initialErrors);
 
-  // проверку засунуть сюда
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const handleChange = (e: any): void => {
     const { name, value } = e.target;
-    // setInputValue(inputValue[name] = value)
     setInputValue({
       ...inputValue,
       [name]: value,
     });
-    // console.log(inputValue);
-    // validate()
   };
 
   const validate = (inputValue: any) => {
@@ -89,6 +79,10 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       formErrors.lastName = "Фамилия обязательно";
     }
 
+    const telRegex = new RegExp(/^([+]?[0-9\s-\(\)]{3,25})*$/i);
+    if (!telRegex.test(inputValue.tel)) {
+      formErrors.tel = "Введите корректный формат телефеона с кодом страны";
+    }
     if (!inputValue.tel) {
       formErrors.tel = "Телефон обязательно";
     }
@@ -96,32 +90,28 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
     const emailRegex = new RegExp(
       /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
     );
-    if (!inputValue.email || !emailRegex.test(inputValue.email)) {
+    if (!emailRegex.test(inputValue.email)) {
+      formErrors.email = "Введите корректный формат email: 'ivanov@mail.ru'";
+    }
+    if (!inputValue.email) {
       formErrors.email = "Email обязательно";
     }
 
     return formErrors;
   };
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleSubmit = 
-    (e: any) => {
-      // console.log("errors", errors);
-      // validate()
-      // console.log('Object.values',Object.values(errors))
-      e.preventDefault();
-      setErrors(validate(inputValue));
-      setIsSubmitted(true)
-      console.log(Object.values(errors).every((el) => el === '' ));
-    
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    setErrors(validate(inputValue));
+    setIsSubmitted(true);
+    console.log(Object.values(errors).every((el) => el === ""));
   };
 
   useEffect(() => {
     console.log("errors", errors);
-    console.log('object.values', Object.values(errors));
+    console.log("object.values", Object.values(errors));
 
-    if (Object.values(errors).every((el) => el === '' ) && isSubmitted) {
+    if (Object.values(errors).every((el) => el === "") && isSubmitted) {
       dispatch(formStage(2));
       dispatch(
         formInfo({
@@ -130,9 +120,8 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
           tel: inputValue.tel,
           email: inputValue.email,
         })
-      )
-
-  };
+      );
+    }
   }, [inputValue, isSubmitted, dispatch, errors]);
 
   // console.log("inputValue", inputValue, errors);
@@ -150,7 +139,9 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
           placeholder="Введите имя"
           handler={handleChange}
         />
-        {errors.firstName && <span className="error-message">{errors.firstName}</span>}
+        {errors.firstName && (
+          <span className="error-message">{errors.firstName}</span>
+        )}
       </div>
       <div className="form-wrapper-input">
         <Input
@@ -162,7 +153,9 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
           placeholder="Введите Фамилию"
           handler={handleChange}
         />
-        {errors.lastName && <span className="error-message">{errors.lastName}</span>}
+        {errors.lastName && (
+          <span className="error-message">{errors.lastName}</span>
+        )}
       </div>
       <div className="form-wrapper-input">
         <Input

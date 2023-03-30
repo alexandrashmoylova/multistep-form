@@ -28,6 +28,13 @@ const Select: React.FC<SelectProps> = ({
   handler,
 }) => {
   const options = countries.map((text, index) => {
+    if (index === 0) {
+      return (
+        <option disabled key={index}>
+          {text}
+        </option>
+      );
+    }
     return <option key={index}>{text}</option>;
   });
   return (

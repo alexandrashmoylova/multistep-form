@@ -34,7 +34,7 @@ const initialState: FormState = {
   },
   FormDeliveryInfo: {
     delivery: "delivery",
-    country: "",
+    country: "Россия",
     city: "",
     zipcode: "",
     address: "",

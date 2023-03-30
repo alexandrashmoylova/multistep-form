@@ -7,8 +7,8 @@ import RadioButton from "../../components/RadioButton/RadioButton";
 import Select from "../../components/Select/Select";
 import TextInput from "../../components/TextInput/TextInput";
 import type { RootState } from "../../store";
-import { formStage, formDelivery, formInfo } from "../../features/form/formSlice";
-import { postData } from "../../api/connection"
+import { formStage, formDelivery } from "../../features/form/formSlice";
+import { postData } from "../../api/connection";
 
 type DeliveryInfoFormProps = {
   submitButtonText: string;
@@ -20,6 +20,14 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
   prevButton,
 }) => {
   const dispatch = useDispatch();
+
+  const initialErrors = {
+    country: "",
+    city: "",
+    zipcode: "",
+    address: "",
+    date: "",
+  };
 
   const currentStage = useSelector((state: RootState) => state.FormStage); // for previous button
   const formstageDelivery = useSelector(
@@ -44,18 +52,11 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
     (state: RootState) => state.FormDeliveryInfo.date
   );
 
-    const formInfoState = useSelector(
-      (state: RootState) => state.FormContactInfo
-    )
+  const formInfoState = useSelector(
+    (state: RootState) => state.FormContactInfo
+  );
 
   const [checkedValue, setChekedValue] = useState(formstageDelivery);
-
-  const radioChangeHandler = (e: any) => {
-    const value = e.currentTarget.value;
-    setChekedValue(value);
-    setInputValue({ ...inputValue, delivery: value });
-  };
-  // console.log("changeDelivery", checkedValue);
 
   const [country, setCountry] = useState(formstageCountry);
 
@@ -70,30 +71,29 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
   });
   console.log(inputValue);
 
+  const [errors, setErrors] = useState(initialErrors);
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const radioChangeHandler = (e: any) => {
+    const value = e.currentTarget.value;
+    setChekedValue(value);
+    setInputValue({ ...inputValue, delivery: value });
+  };
+
   const handleCountryChange = (e: any): void => {
     const value = e.target.value;
     setCountry(value);
     setInputValue({ ...inputValue, country: value });
-    // console.log("country", e.target.name);
   };
 
   const handleChange = (e: any): void => {
-    const {name, value} = e.target;
-    setInputValue({ 
-      ...inputValue, 
+    const { name, value } = e.target;
+    setInputValue({
+      ...inputValue,
       [name]: value,
     });
   };
-
-  const initialErrors = {
-    country: "",
-    city: "",
-    zipcode: "",
-    address: "",
-    date: "",
-  };
-
-  const [errors, setErrors] = useState(initialErrors);
 
   const validate = (inputValue: any) => {
     let formErrors = {
@@ -103,14 +103,18 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
       address: "",
       date: "",
     };
-    console.log("formErrors", formErrors);
+    // console.log("formErrors", formErrors);
 
-    if (!inputValue.country && 'Выберите страну') {
+    if (!inputValue.country) {
       formErrors.country = "Страна обязательно";
     }
 
     if (!inputValue.city) {
       formErrors.city = "Город обязательно";
+    }
+
+    if (inputValue.zipcode.length < 6) {
+      formErrors.zipcode = "Минимум 6 цифр";
     }
 
     if (!inputValue.zipcode) {
@@ -128,91 +132,54 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
     return formErrors;
   };
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // const [isSubmitted, setIsSubmitted] = useState(false);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setErrors(validate(inputValue))
-      setIsSubmitted(true);
-    
-
+    setErrors(validate(inputValue));
+    setIsSubmitted(true);
   };
 
   useEffect(() => {
-    console.log("errors", errors);
-    console.log('object.values', Object.values(errors));
+    // console.log("errors", errors);
+    // console.log("object.values", Object.values(errors));
+    dispatch(
+      formDelivery({
+        delivery: inputValue.delivery,
+        country: inputValue.country,
+        city: inputValue.city,
+        zipcode: inputValue.zipcode,
+        address: inputValue,
+        date: inputValue.date,
+        comment: inputValue.comment,
+      })
+    );
 
+    const userData = {
+      ...formInfoState,
+      ...inputValue,
+    };
 
-
-    if (Object.values(errors).every((el) => el === '' && isSubmitted)) {
-      dispatch(
-        formDelivery({
-          delivery: inputValue.delivery,
-          country: inputValue.country,
-          city: inputValue.city,
-          zipcode: inputValue.zipcode,
-          address: inputValue,
-          date: inputValue.date,
-          comment: inputValue.comment,
-        })
-      );
-
-      const userData = {
-        ...formInfoState,
-        ...inputValue
+    const fetchData = async () => {
+      try {
+        await postData(userData);
+        dispatch(formStage(3));
+      } catch (err) {
+        console.log(err);
+        dispatch(formStage(4));
       }
+    };
 
-      const fetchData = async () => {
-        await postData(userData)
-        dispatch(formStage(3)); 
-        try {
-          await postData(userData)
-          dispatch(formStage(3)); 
-        } catch (err) {
-          console.log(err);
-          dispatch(formStage(4));
-        }
-      }
-
+    if (Object.values(errors).every((el) => el === "" && isSubmitted)) {
       fetchData();
+    }
 
-  }
-}, [inputValue, isSubmitted, dispatch, errors]);
-
-
-  //   // async 
-  //   if (isSubmitted) {
-  //     dispatch(
-  //       formDelivery({
-  //         delivery: inputValue.delivery,
-  //         country: inputValue.country,
-  //         city: inputValue.city,
-  //         zipcode: inputValue.zipcode,
-  //         address: inputValue,
-  //         date: inputValue.date,
-  //         comment: inputValue.comment,
-  //       })
-  //     );
-  //     const userData = {
-  //       ...formInfoState,
-  //       ...inputValue
-  //     }
-  //     // console.log('userData', userData);
-    
-  //     // завернуть в try catch
-  //     postData(userData)
-  //     .then((data) => {
-  //       dispatch(formStage(3)); 
-  //       //
-  //       console.log('postData', data);
-  //     })
-      
-  //   }
-  // }, [inputValue, isSubmitted, dispatch]);
+    if (inputValue.delivery === "pickup" && isSubmitted) {
+      Object.values(errors).forEach((el) => el === "");
+      fetchData();
+    }
+  }, [inputValue, isSubmitted, dispatch, errors]);
 
   return (
-    <form noValidate={true}  className="form" action="" onSubmit={handleSubmit}>
+    <form noValidate={true} className="form" action="" onSubmit={handleSubmit}>
       <h2 className="title">Адрес доставки:</h2>
       <div className="form__wrapper-radio">
         <RadioButton
@@ -236,82 +203,92 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
       </div>
       {checkedValue === "delivery" ? (
         <>
-        <div className="form-wrapper-input">
-        <Select
-            label="Выберите страну:"
-            name="country"
-            id="country"
-            value={country}
-            required
-            handler={handleCountryChange}
-          />
-          {errors.country && <span className="error-message">{errors.country}</span>}
-        </div>
-        <div className="form-wrapper-input">
-        <Input
-            label="Город:"
-            type="text"
-            name="city"
-            id="city"
-            value={inputValue.city}
-            required
-            placeholder="Введите Город"
-            handler={handleChange}
-          />
-          {errors.city && <span className="error-message">{errors.city}</span>}
-        </div>
-        <div className="form-wrapper-input">
-        <Input
-            label="Индекс:"
-            type="text"
-            name="zipcode"
-            id="zipcode"
-            value={inputValue.zipcode}
-            required
-            placeholder="Введите Индекс"
-            handler={handleChange}
-          />
-          {errors.zipcode && <span className="error-message">{errors.zipcode}</span>}
-        </div>
-        <div className="form-wrapper-input">
-        <Input
-            label="Адрес:"
-            type="text"
-            name="address"
-            id="address"
-            value={inputValue.address}
-            required
-            placeholder="Введите Адрес"
-            handler={handleChange}
-          />
-          {errors.address && <span className="error-message">{errors.address}</span>}
-        </div>
-        <div className="form-wrapper-input">
-        <Input
-            label="Выберите дату:"
-            type="date"
-            id="date"
-            name="date"
-            value={inputValue.date}
-            required
-            handler={handleChange}
-          />
-          {errors.date && <span className="error-message">{errors.date}</span>}
-        </div>
-        <div className="form-wrapper-input">
-        <TextInput
-            label="Введите ваш комментарий"
-            id="comment"
-            name="comment"
-            value={inputValue.comment}
-            placeholder="Напишите здесь что-нибудь"
-            handler={handleChange}
-          />
-        </div>
+          <div className="form-wrapper-input">
+            <Select
+              label="Выберите страну:"
+              name="country"
+              id="country"
+              value={country}
+              required
+              handler={handleCountryChange}
+            />
+            {errors.country && (
+              <span className="error-message">{errors.country}</span>
+            )}
+          </div>
+          <div className="form-wrapper-input">
+            <Input
+              label="Город:"
+              type="text"
+              name="city"
+              id="city"
+              value={inputValue.city}
+              required
+              placeholder="Введите Город"
+              handler={handleChange}
+            />
+            {errors.city && (
+              <span className="error-message">{errors.city}</span>
+            )}
+          </div>
+          <div className="form-wrapper-input">
+            <Input
+              label="Индекс:"
+              type="text"
+              name="zipcode"
+              id="zipcode"
+              value={inputValue.zipcode}
+              required
+              placeholder="Введите Индекс"
+              handler={handleChange}
+            />
+            {errors.zipcode && (
+              <span className="error-message">{errors.zipcode}</span>
+            )}
+          </div>
+          <div className="form-wrapper-input">
+            <Input
+              label="Адрес:"
+              type="text"
+              name="address"
+              id="address"
+              value={inputValue.address}
+              required
+              placeholder="Введите Адрес"
+              handler={handleChange}
+            />
+            {errors.address && (
+              <span className="error-message">{errors.address}</span>
+            )}
+          </div>
+          <div className="form-wrapper-input">
+            <Input
+              label="Выберите дату:"
+              type="date"
+              id="date"
+              name="date"
+              value={inputValue.date}
+              required
+              handler={handleChange}
+            />
+            {errors.date && (
+              <span className="error-message">{errors.date}</span>
+            )}
+          </div>
+          <div className="form-wrapper-input">
+            <TextInput
+              label="Введите ваш комментарий"
+              id="comment"
+              name="comment"
+              value={inputValue.comment}
+              placeholder="Напишите здесь что-нибудь"
+              handler={handleChange}
+            />
+          </div>
         </>
       ) : (
         <div className="form-wrapper-input">
-        <TextInput
+          <TextInput
             label="Введите ваш комментарий"
             id="comment"
             name="comment"
@@ -324,18 +301,14 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
 
       <div className="form__btn-wrapper">
         {prevButton && (
-            <input
-              className="button button-back"
-              type="submit"
-              value={`Назад`}
-              onClick={() => dispatch(formStage(currentStage - 1))}
-            />
-        )}
           <input
-            className="button"
+            className="button button-back"
             type="submit"
-            value={submitButtonText}
+            value={`Назад`}
+            onClick={() => dispatch(formStage(currentStage - 1))}
           />
+        )}
+        <input className="button" type="submit" value={submitButtonText} />
       </div>
     </form>
   );
