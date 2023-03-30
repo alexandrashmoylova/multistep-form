@@ -105,7 +105,6 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
     e.preventDefault();
     setErrors(validate(inputValue));
     setIsSubmitted(true);
-    console.log(Object.values(errors).every((el) => el === ""));
   };
 
   useEffect(() => {

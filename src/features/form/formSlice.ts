@@ -56,7 +56,7 @@ export const FormSlice = createSlice({
     formDelivery: (state, action: PayloadAction<any>) => {
       state.FormDeliveryInfo = action.payload;
     },
-    clearDeliveryForm:  (state) => {
+    clearDeliveryForm: (state) => {
       state.FormDeliveryInfo = initialState.FormDeliveryInfo;
     },
   },
