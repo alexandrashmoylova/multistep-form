@@ -11,6 +11,4 @@ test('check page h1 title loads', async () => {
     </Provider>);
   const element = screen.getByTestId('main-title');
   expect(element).toBeInTheDocument();
-  // console.log(element);
-  
 });
