@@ -69,7 +69,7 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
     date: formstageDate,
     comment: formstageComment,
   });
-  console.log(inputValue);
+  // console.log(inputValue);
 
   const [errors, setErrors] = useState(initialErrors);
 
@@ -147,7 +147,7 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
         country: inputValue.country,
         city: inputValue.city,
         zipcode: inputValue.zipcode,
-        address: inputValue,
+        address: inputValue.address,
         date: inputValue.date,
         comment: inputValue.comment,
       })
@@ -173,7 +173,7 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
     }
 
     if (inputValue.delivery === "pickup" && isSubmitted) {
-      Object.values(errors).forEach((el) => el === "");
+      // Object.values(errors).forEach((el) => el === "");
       fetchData();
     }
   }, [inputValue, isSubmitted, dispatch, errors]);
