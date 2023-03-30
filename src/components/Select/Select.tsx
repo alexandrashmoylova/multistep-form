@@ -1,6 +1,7 @@
 import * as React from "react";
 
 export const countries: string[] = [
+  "Выберите страну",
   "Россия",
   "Казахстан",
   "Турция",

@@ -68,7 +68,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       ...inputValue,
       [name]: value,
     });
-    console.log(inputValue);
+    // console.log(inputValue);
     // validate()
   };
 
@@ -105,22 +105,23 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = useCallback(
+  const handleSubmit = 
     (e: any) => {
-      console.log("errors", errors);
+      // console.log("errors", errors);
       // validate()
       // console.log('Object.values',Object.values(errors))
       e.preventDefault();
       setErrors(validate(inputValue));
-      setIsSubmitted(true);
-    },
-    [errors, setErrors, validate]
-  );
+      setIsSubmitted(true)
+      console.log(Object.values(errors).every((el) => el === '' ));
+    
+  };
 
   useEffect(() => {
     console.log("errors", errors);
-    if (Object.keys(errors).length === 0 && isSubmitted) {
-      console.log("inputValue", inputValue);
+    console.log('object.values', Object.values(errors));
+
+    if (Object.values(errors).every((el) => el === '' ) && isSubmitted) {
       dispatch(formStage(2));
       dispatch(
         formInfo({
@@ -129,11 +130,12 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
           tel: inputValue.tel,
           email: inputValue.email,
         })
-      );
-    }
-  }, [errors, dispatch, inputValue]);
+      )
 
-  console.log("inputValue", inputValue, errors);
+  };
+  }, [inputValue, isSubmitted, dispatch, errors]);
+
+  // console.log("inputValue", inputValue, errors);
 
   return (
     <form noValidate={true} className="form" onSubmit={handleSubmit}>
@@ -148,9 +150,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
           placeholder="Введите имя"
           handler={handleChange}
         />
-        {errors.firstName && (
-          <span className="error-message">{errors.firstName}</span>
-        )}
+        {errors.firstName && <span className="error-message">{errors.firstName}</span>}
       </div>
       <div className="form-wrapper-input">
         <Input
@@ -162,9 +162,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
           placeholder="Введите Фамилию"
           handler={handleChange}
         />
-        {errors.lastName && (
-          <span className="error-message">{errors.lastName}</span>
-        )}
+        {errors.lastName && <span className="error-message">{errors.lastName}</span>}
       </div>
       <div className="form-wrapper-input">
         <Input

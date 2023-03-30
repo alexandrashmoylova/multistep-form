@@ -85,36 +85,102 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
     });
   };
 
-  // const [isSubmitted, setIsSubmitted] = useState(false);
-  const handleSubmit = async (e: any) => {
-    // здесь использую await
-    e.preventDefault();
-    // setIsSubmitted(true);
-    dispatch(
-      formDelivery({
-        delivery: inputValue.delivery,
-        country: inputValue.country,
-        city: inputValue.city,
-        zipcode: inputValue.zipcode,
-        address: inputValue,
-        date: inputValue.date,
-        comment: inputValue.comment,
-      })
-    );
-    const userData = {
-      ...formInfoState,
-      ...inputValue
-    }
-    try {
-      await postData(userData)
-      dispatch(formStage(3)); 
-    } catch (err) {
-      console.log(err);
-      dispatch(formStage(4));
-    }
+  const initialErrors = {
+    country: "",
+    city: "",
+    zipcode: "",
+    address: "",
+    date: "",
   };
 
-  // useEffect(() => {
+  const [errors, setErrors] = useState(initialErrors);
+
+  const validate = (inputValue: any) => {
+    let formErrors = {
+      country: "",
+      city: "",
+      zipcode: "",
+      address: "",
+      date: "",
+    };
+    console.log("formErrors", formErrors);
+
+    if (!inputValue.country && 'Выберите страну') {
+      formErrors.country = "Страна обязательно";
+    }
+
+    if (!inputValue.city) {
+      formErrors.city = "Город обязательно";
+    }
+
+    if (!inputValue.zipcode) {
+      formErrors.zipcode = "Индекс обязательно";
+    }
+
+    if (!inputValue.address) {
+      formErrors.address = "Адрес обязательно";
+    }
+
+    if (!inputValue.address) {
+      formErrors.date = "Дата обязательно";
+    }
+
+    return formErrors;
+  };
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // const [isSubmitted, setIsSubmitted] = useState(false);
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setErrors(validate(inputValue))
+      setIsSubmitted(true);
+    
+
+  };
+
+  useEffect(() => {
+    console.log("errors", errors);
+    console.log('object.values', Object.values(errors));
+
+
+
+    if (Object.values(errors).every((el) => el === '' && isSubmitted)) {
+      dispatch(
+        formDelivery({
+          delivery: inputValue.delivery,
+          country: inputValue.country,
+          city: inputValue.city,
+          zipcode: inputValue.zipcode,
+          address: inputValue,
+          date: inputValue.date,
+          comment: inputValue.comment,
+        })
+      );
+
+      const userData = {
+        ...formInfoState,
+        ...inputValue
+      }
+
+      const fetchData = async () => {
+        await postData(userData)
+        dispatch(formStage(3)); 
+        try {
+          await postData(userData)
+          dispatch(formStage(3)); 
+        } catch (err) {
+          console.log(err);
+          dispatch(formStage(4));
+        }
+      }
+
+      fetchData();
+
+  }
+}, [inputValue, isSubmitted, dispatch, errors]);
+
+
   //   // async 
   //   if (isSubmitted) {
   //     dispatch(
@@ -146,7 +212,7 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
   // }, [inputValue, isSubmitted, dispatch]);
 
   return (
-    <form className="form" action="" onSubmit={(e) => handleSubmit(e)}>
+    <form noValidate={true}  className="form" action="" onSubmit={handleSubmit}>
       <h2 className="title">Адрес доставки:</h2>
       <div className="form__wrapper-radio">
         <RadioButton
@@ -170,7 +236,8 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
       </div>
       {checkedValue === "delivery" ? (
         <>
-          <Select
+        <div className="form-wrapper-input">
+        <Select
             label="Выберите страну:"
             name="country"
             id="country"
@@ -178,7 +245,10 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
             required
             handler={handleCountryChange}
           />
-          <Input
+          {errors.country && <span className="error-message">{errors.country}</span>}
+        </div>
+        <div className="form-wrapper-input">
+        <Input
             label="Город:"
             type="text"
             name="city"
@@ -188,7 +258,10 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
             placeholder="Введите Город"
             handler={handleChange}
           />
-          <Input
+          {errors.city && <span className="error-message">{errors.city}</span>}
+        </div>
+        <div className="form-wrapper-input">
+        <Input
             label="Индекс:"
             type="text"
             name="zipcode"
@@ -198,7 +271,10 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
             placeholder="Введите Индекс"
             handler={handleChange}
           />
-          <Input
+          {errors.zipcode && <span className="error-message">{errors.zipcode}</span>}
+        </div>
+        <div className="form-wrapper-input">
+        <Input
             label="Адрес:"
             type="text"
             name="address"
@@ -208,7 +284,10 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
             placeholder="Введите Адрес"
             handler={handleChange}
           />
-          <Input
+          {errors.address && <span className="error-message">{errors.address}</span>}
+        </div>
+        <div className="form-wrapper-input">
+        <Input
             label="Выберите дату:"
             type="date"
             id="date"
@@ -217,7 +296,10 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
             required
             handler={handleChange}
           />
-          <TextInput
+          {errors.date && <span className="error-message">{errors.date}</span>}
+        </div>
+        <div className="form-wrapper-input">
+        <TextInput
             label="Введите ваш комментарий"
             id="comment"
             name="comment"
@@ -225,16 +307,19 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
             placeholder="Напишите здесь что-нибудь"
             handler={handleChange}
           />
+        </div>
         </>
       ) : (
+        <div className="form-wrapper-input">
         <TextInput
-          label="Введите ваш комментарий"
-          id="comment"
-          name="comment"
-          value={inputValue.comment}
-          placeholder="Напишите здесь что-нибудь"
-          handler={handleChange}
-        />
+            label="Введите ваш комментарий"
+            id="comment"
+            name="comment"
+            value={inputValue.comment}
+            placeholder="Напишите здесь что-нибудь"
+            handler={handleChange}
+          />
+        </div>
       )}
 
       <div className="form__btn-wrapper">
