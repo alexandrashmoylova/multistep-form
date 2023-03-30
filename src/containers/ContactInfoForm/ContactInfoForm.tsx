@@ -15,11 +15,9 @@ export interface Errors {
 
 type ContactInfoFormProps = {
   submitButtonText: string;
-  prevButton: boolean;
 };
 
 const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
-  prevButton,
   submitButtonText,
 }) => {
   const dispatch = useDispatch();
@@ -69,7 +67,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       tel: "",
       email: "",
     };
-    console.log("formErrors", formErrors);
+    // console.log("formErrors", formErrors);
 
     if (!inputValue.firstName) {
       formErrors.firstName = "Имя обязательно";
@@ -108,9 +106,6 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
   };
 
   useEffect(() => {
-    console.log("errors", errors);
-    console.log("object.values", Object.values(errors));
-
     if (Object.values(errors).every((el) => el === "") && isSubmitted) {
       dispatch(formStage(2));
       dispatch(
@@ -123,8 +118,6 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       );
     }
   }, [inputValue, isSubmitted, dispatch, errors]);
-
-  // console.log("inputValue", inputValue, errors);
 
   return (
     <form noValidate={true} className="form" onSubmit={handleSubmit}>

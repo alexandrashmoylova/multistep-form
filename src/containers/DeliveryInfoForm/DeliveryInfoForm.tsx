@@ -125,7 +125,7 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
       formErrors.address = "Адрес обязательно";
     }
 
-    if (!inputValue.address) {
+    if (!inputValue.date) {
       formErrors.date = "Дата обязательно";
     }
 
@@ -173,7 +173,7 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
     }
 
     if (inputValue.delivery === "pickup" && isSubmitted) {
-      // Object.values(errors).forEach((el) => el === "");
+      Object.values(errors).forEach((el) => el === "");
       fetchData();
     }
   }, [inputValue, isSubmitted, dispatch, errors]);
