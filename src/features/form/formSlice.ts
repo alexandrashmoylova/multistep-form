@@ -57,15 +57,7 @@ export const FormSlice = createSlice({
       state.FormDeliveryInfo = action.payload;
     },
     clearDeliveryForm:  (state) => {
-      state.FormDeliveryInfo = {
-        delivery: "delivery",
-        country: "Россия",
-        city: "",
-        zipcode: "",
-        address: "",
-        date: "",
-        comment: "",
-      };
+      state.FormDeliveryInfo = initialState.FormDeliveryInfo;
     },
   },
 });
