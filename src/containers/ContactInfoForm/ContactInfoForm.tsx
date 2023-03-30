@@ -15,9 +15,11 @@ export interface Errors {
 
 type ContactInfoFormProps = {
   submitButtonText: string;
+  prevButton: boolean;
 };
 
 const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
+  prevButton,
   submitButtonText,
 }) => {
   const dispatch = useDispatch();
@@ -29,6 +31,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
     email: "",
   };
 
+  const currentStage = useSelector((state: RootState) => state.FormStage);
   const formstageFirstName = useSelector(
     (state: RootState) => state.FormContactInfo.firstName
   );
@@ -175,6 +178,14 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
         {errors.email && <span className="error-message">{errors.email}</span>}
       </div>
       <div className="form__btn-wrapper">
+        {prevButton && (
+          <input
+            className="button button-back"
+            type="submit"
+            value={`Назад`}
+            onClick={() => dispatch(formStage(currentStage - 1))}
+          />
+        )}
         <input className="button" type="submit" value={submitButtonText} />
       </div>
     </form>

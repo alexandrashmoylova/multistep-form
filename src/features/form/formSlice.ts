@@ -52,22 +52,23 @@ export const FormSlice = createSlice({
     },
     formInfo: (state, action: PayloadAction<any>) => {
       state.FormContactInfo = action.payload;
-      // console.log('state', state.FormContactInfo.firstName);
-      // console.log('state', state.FormContactInfo.lastName);
-      // console.log('state', state.FormContactInfo.tel);
-      // console.log('state', state.FormContactInfo.email);
     },
     formDelivery: (state, action: PayloadAction<any>) => {
       state.FormDeliveryInfo = action.payload;
-      // console.log('state', state.FormDeliveryInfo.delivery);
-      // console.log('state', state.FormDeliveryInfo.country);
-      // console.log('state', state.FormDeliveryInfo.city);
-      // console.log('state', state.FormDeliveryInfo.zipcode);
-      // console.log('state', state.FormDeliveryInfo.comment);
-      // console.log('state', state.FormDeliveryInfo.date);
+    },
+    clearDeliveryForm:  (state) => {
+      state.FormDeliveryInfo = {
+        delivery: "delivery",
+        country: "Россия",
+        city: "",
+        zipcode: "",
+        address: "",
+        date: "",
+        comment: "",
+      };
     },
   },
 });
 
-export const { formStage, formInfo, formDelivery } = FormSlice.actions;
+export const { formStage, formInfo, formDelivery, clearDeliveryForm } = FormSlice.actions;
 export const reducer = FormSlice.reducer;

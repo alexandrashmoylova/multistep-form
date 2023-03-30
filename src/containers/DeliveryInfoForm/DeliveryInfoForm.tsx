@@ -7,7 +7,7 @@ import RadioButton from "../../components/RadioButton/RadioButton";
 import Select from "../../components/Select/Select";
 import TextInput from "../../components/TextInput/TextInput";
 import type { RootState } from "../../store";
-import { formStage, formDelivery } from "../../features/form/formSlice";
+import { formStage, formDelivery, clearDeliveryForm } from "../../features/form/formSlice";
 import { postData } from "../../api/connection";
 
 type DeliveryInfoFormProps = {
@@ -58,7 +58,6 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
 
   const [checkedValue, setChekedValue] = useState(formstageDelivery);
 
-  const [country, setCountry] = useState(formstageCountry);
 
   const [inputValue, setInputValue] = useState({
     delivery: formstageDelivery,
@@ -72,6 +71,8 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
   // console.log(inputValue);
 
   const [errors, setErrors] = useState(initialErrors);
+
+  const [country, setCountry] = useState(formstageCountry);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -137,6 +138,13 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
     setErrors(validate(inputValue));
     setIsSubmitted(true);
   };
+
+  const clearForm = () => {
+    dispatch(
+      formStage(currentStage - 1),
+    )
+    dispatch(clearDeliveryForm());  
+  }
 
   useEffect(() => {
     // console.log("errors", errors);
@@ -305,7 +313,7 @@ const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
             className="button button-back"
             type="submit"
             value={`Назад`}
-            onClick={() => dispatch(formStage(currentStage - 1))}
+            onClick={clearForm}
           />
         )}
         <input className="button" type="submit" value={submitButtonText} />
